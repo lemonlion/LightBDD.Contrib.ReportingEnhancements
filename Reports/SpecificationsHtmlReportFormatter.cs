@@ -53,7 +53,8 @@ public class CustomisableHtmlReportFormatter : IReportFormatter
             IncludeFeatureSummary = Options.IncludeFeatureSummary,
             ShowStatusFilterToggles = Options.ShowStatusFilterToggles,
             WriteRuntimeIds = Options.WriteRuntimeIds,
-            StepsHiddenInitially = Options.StepsHiddenInitially
+            StepsHiddenInitially = Options.StepsHiddenInitially,
+            FormatResult = Options.FormatResult
         };
         writer.Write(_options);
     }

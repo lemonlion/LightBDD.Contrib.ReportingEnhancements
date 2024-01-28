@@ -1,20 +1,27 @@
 ﻿namespace LightBDD.Contrib.ReportingEnhancements.Reports
 {
-    public static class Html
+    public class Html
     {
-        public static TagBuilder Checkbox()
+        private readonly bool _format;
+
+        public Html(bool format = false)
+        {
+            _format = format;
+        }
+
+        public TagBuilder Checkbox()
         {
             return Tag(Html5Tag.Input).Attribute(Html5Attribute.Type, "checkbox");
         }
 
-        public static TagBuilder Radio()
+        public TagBuilder Radio()
         {
             return Tag(Html5Tag.Input).Attribute(Html5Attribute.Type, "radio");
         }
 
-        public static TagBuilder Tag(Html5Tag tag)
+        public TagBuilder Tag(Html5Tag tag)
         {
-            return new TagBuilder(tag);
+            return new TagBuilder(tag, _format);
         }
 
         public static TextBuilder Text(string text)
@@ -24,12 +31,12 @@
 
         public static IHtmlNode Br()
         {
-            return Text("<br/>");
+            return Text("<br>");
         }
 
         public static IHtmlNode Nothing()
         {
-            return Tag(Html5Tag.Div).SkipEmpty();
+            return new Html().Tag(Html5Tag.Div).SkipEmpty();
         }
     }
 }

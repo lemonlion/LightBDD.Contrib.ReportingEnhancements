@@ -19,6 +19,7 @@ public class HtmlReportAdvancedOptions
     public bool ShowExampleDiagramsToggle { get; set; } = true;
     public bool IncludeIgnoredTests { get; set; } = true;
     public bool StepsHiddenInitially { get; set; } = true;
+    public bool FormatResult { get; set; }
 
     public HtmlReportAdvancedOptions SetOnlyCreateReportOnFullTestRun(Assembly testAssembly)
     {

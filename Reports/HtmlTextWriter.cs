@@ -80,7 +80,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
         internal HtmlTextWriter WriteTag(IHtmlNode node)
         {
-            node.Write(this);
+            node.Write(this, "");
             return this;
         }
     }

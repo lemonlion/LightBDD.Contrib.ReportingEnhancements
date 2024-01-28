@@ -29,7 +29,7 @@
             return this;
         }
 
-        public HtmlTextWriter Write(HtmlTextWriter writer)
+        public HtmlTextWriter Write(HtmlTextWriter writer, string indent)
         {
             if (IsEmpty())
                 return writer;

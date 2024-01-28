@@ -9,10 +9,12 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
         private IHtmlNode[] _nodes = Array.Empty<IHtmlNode>();
         private bool _spaceBefore;
         private bool _spaceAfter;
+        private readonly bool _isFormatted;
         private readonly string _tag;
 
-        public TagBuilder(Html5Tag tag)
+        public TagBuilder(Html5Tag tag, bool isFormatted)
         {
+            _isFormatted = isFormatted;
             _tag = tag.ToString().ToLowerInvariant();
         }
 
@@ -108,20 +110,28 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
         public bool IsEmpty() => _skipEmpty && _nodes.All(n => n.IsEmpty());
 
-        public HtmlTextWriter Write(HtmlTextWriter writer)
+        public HtmlTextWriter Write(HtmlTextWriter writer, string indent)
         {
             if (IsEmpty())
                 return writer;
 
-            if (_spaceBefore)
-                writer.Write(" ");
+            if(_isFormatted)
+                writer.Write("\n" + indent);
+
+            if (_spaceBefore && !_isFormatted)
+                writer.Write(" ");;
+
+            var newIndent = indent + "\t";
 
             if (_nodes.Any())
             {
                 writer.OpenTag(_tag, _attributes);
 
                 foreach (var node in _nodes)
-                    node.Write(writer);
+                    node.Write(writer, newIndent);
+
+                if(_isFormatted && _nodes.Any(x => x is not TextBuilder))
+                    writer.Write("\n" + indent);
 
                 writer.CloseTag(_tag);
             }

@@ -5,8 +5,15 @@ using LightBDD.Core.Metadata;
 
 namespace LightBDD.Contrib.ReportingEnhancements.Reports
 {
-    internal class HtmlStepNameDecorator : IStepNameDecorator
+    public class HtmlStepNameDecorator : IStepNameDecorator
     {
+        private Html _html;
+
+        public HtmlStepNameDecorator(Html? html = null)
+        {
+            _html = html ?? new Html();
+        }
+
         public string DecorateStepTypeName(IStepTypeNameInfo stepTypeName)
         {
             return stepTypeName.Name; // Html.Tag(Html5Tag.Span).Class("stepType").Content(stepTypeName.Name));
@@ -15,7 +22,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
         public string DecorateParameterValue(INameParameterInfo parameter)
         {
             return AsString(
-                Html.Tag(Html5Tag.Span)
+                _html.Tag(Html5Tag.Span)
                     .Class($"inline-param {GetParameterValueClass(parameter)}")
                     .Content(parameter.FormattedValue));
         }
@@ -36,7 +43,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
         {
             var sb = new StringBuilder();
             using (var writer = new HtmlTextWriter(new StringWriter(sb)))
-                node.Write(writer);
+                node.Write(writer, "");
             return sb.ToString();
         }
     }

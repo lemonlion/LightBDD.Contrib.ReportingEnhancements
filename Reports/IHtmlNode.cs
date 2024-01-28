@@ -2,7 +2,7 @@
 {
     public interface IHtmlNode
     {
-        HtmlTextWriter Write(HtmlTextWriter writer);
+        HtmlTextWriter Write(HtmlTextWriter writer, string indent);
         bool IsEmpty();
     }
 }
