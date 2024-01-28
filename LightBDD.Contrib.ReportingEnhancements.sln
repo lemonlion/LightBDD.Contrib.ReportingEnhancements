@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightBDD.Contrib.ReportingEnhancements", "LightBDD.Contrib.ReportingEnhancements.csproj", "{4352694D-AAED-436C-94AA-BDDD54372995}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4352694D-AAED-436C-94AA-BDDD54372995}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4352694D-AAED-436C-94AA-BDDD54372995}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4352694D-AAED-436C-94AA-BDDD54372995}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4352694D-AAED-436C-94AA-BDDD54372995}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {239A594B-D498-449D-A873-8D3F418A4EF6}
+	EndGlobalSection
+EndGlobal
