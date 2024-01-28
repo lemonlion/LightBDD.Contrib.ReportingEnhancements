@@ -14,7 +14,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
                 ShowExampleDiagramsToggle = true,
                 Title = "Specifications",
                 WriteRuntimeIds = false,
-                IncludeDurations = true,
+                IncludeDurations = false,
                 IncludeExecutionSummary = false,
                 OnlyCreateReportOnFullySuccessfulTestRun = true,
                 ShowStatusFilterToggles = false,

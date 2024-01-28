@@ -240,7 +240,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
                     .SkipEmpty());
         }
 
-        protected virtual IHtmlNode GetDuration(ExecutionTime executionTime)
+        protected override IHtmlNode GetDuration(ExecutionTime executionTime)
         {
             return _html.Tag(Html5Tag.Span)
                 .Class("duration")
