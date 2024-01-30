@@ -22,7 +22,7 @@ public class CustomisableHtmlReportFormatter : IReportFormatter
         Options ??= new HtmlReportAdvancedOptions();
         var scenariosRun = features.SelectMany(x => x.GetScenarios()).ToList();
 
-        if (!Options.OnlyCreateReportOnFullySuccessfulTestRun)
+        if (Options.OnlyCreateReportOnFullySuccessfulTestRun)
         {
             if (scenariosRun.Any(x => x.Status == ExecutionStatus.Failed))
                 return; 
