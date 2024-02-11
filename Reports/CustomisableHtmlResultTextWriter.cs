@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using LightBDD.Core.Execution;
 using LightBDD.Core.Formatting;
 using LightBDD.Core.Results;
 using LightBDD.Framework.Reporting;
@@ -7,8 +8,6 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 {
     public class CustomisableHtmlResultTextWriter : DefaultHtmlResultTextWriter
     {
-        private int _currentToggleIdNumber = 0;
-
         public bool WriteRuntimeIds { get; set; }
         public bool IncludeDiagramsAsCode => DiagramAsCode.Any();
         public bool IncludeExecutionSummary { get; set; }
@@ -23,6 +22,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
         public string DiagramsAsCodeCodeBehindTitle { get; set; }
         public bool StepsHiddenInitially { get; set; }
         public bool FormatResult { get; set; }
+        public Func<IScenarioResult, bool>? TreatScenariosAsPassed { get; set; }
 
         public CustomisableHtmlResultTextWriter(Stream outputStream, IFeatureResult[] features) : base(outputStream, 
             features,
@@ -66,13 +66,14 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
         protected override IHtmlNode GetScenario(IScenarioResult scenario, int featureIndex, int scenarioIndex)
         {
+            var treatAsPassed = TreatScenariosAsPassed?.Invoke(scenario) ?? false;
+
             var scenarioContent = new List<IHtmlNode>
             {
-
                 _html.Tag(Html5Tag.Div).Class("categories")
                     .Content(scenario.Info.Categories.Select(GetCategory))
                     .SkipEmpty(),
-                _html.Tag(Html5Tag.Div).Class("scenario-steps").Content(scenario.GetSteps().Select(GetStep))
+                _html.Tag(Html5Tag.Div).Class("scenario-steps").Content(scenario.GetSteps().Select(x => GetStep(x, treatAsPassed)))
             };
 
             if (IncludeDiagramsAsCode)
@@ -101,8 +102,14 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
             }
 
             var toggleId = $"toggle{featureIndex}_{scenarioIndex}";
-            var scenarioId = $"scenario{featureIndex}_{scenarioIndex + 1}";
-            var checkbox = _html.Checkbox().Id(toggleId).Class("toggle toggleS");
+            var scenarioId = $"scenario{featureIndex}_{scenarioIndex + 1}"; // TODO: get something that's unique based on uniqueness rather than a random runtimeId each time, and not something based on order (which can then change the entire document each time a new node is added)
+            var scenarioH3 = _html.Tag(Html5Tag.H3).Class("header title");
+            scenarioH3 = WriteRuntimeIds ? scenarioH3.Id(scenarioId) : scenarioH3;
+            
+            var checkbox = _html.Checkbox().Class("toggle toggleS");
+            checkbox = WriteRuntimeIds ? checkbox.Id(toggleId) : checkbox;
+
+            var smallLink = WriteRuntimeIds ? GetSmallLink(scenarioId) : Html.Nothing();
 
             if (!StepsHiddenInitially)
                 checkbox.Checked();
@@ -110,19 +117,19 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
             return _html.Tag(Html5Tag.Div).Class("scenario " + GetStatusClass(scenario.Status))
                 .Attribute("data-categories", GetScenarioCategories(scenario))
                 .Content(
-                    checkbox,
-                    _html.Tag(Html5Tag.H3).Id(scenarioId).Class("header title").Content(
-                        _html.Tag(Html5Tag.Label).For(toggleId).Class("controls").Content(
+                    scenarioH3.Content(
+                        _html.Tag(Html5Tag.Label).Class("controls").Content(
+                            checkbox,
                             GetCheckBoxTag(),
-                            GetStatus(scenario.Status)),
+                            GetStatus(treatAsPassed ? ExecutionStatus.Passed : scenario.Status)),
                         _html.Tag(Html5Tag.Span).Content(
                             Html.Text(scenario.Info.Name.Format(_stepNameDecorator)),
                             _html.Tag(Html5Tag.Span).Content(scenario.Info.Labels.Select(GetLabel)).SkipEmpty(),
                             GetDuration(scenario.ExecutionTime),
-                            GetSmallLink(scenarioId))),
+                            smallLink)),
                     _html.Tag(Html5Tag.Div).Class("content").Content(scenarioContent),
                     _html.Tag(Html5Tag.Div).Class("details").Content(
-                        GetStatusDetails(scenario.StatusDetails),
+                        GetStatusDetails(treatAsPassed & scenario.Status != ExecutionStatus.Passed ? null : scenario.StatusDetails),
                         GetComments(scenario.GetAllSteps()),
                         GetAttachments(scenario.GetAllSteps())).SkipEmpty());
         }
@@ -140,6 +147,31 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
             for (var i = 0; i < _features.Length; ++i)
                 yield return GetFeatureDetails(_features[i], i + 1);
+        }
+
+        protected override IHtmlNode GetFeatureDetails(IFeatureResult feature, int index)
+        {
+            var checkbox = _html.Checkbox().Class("toggle toggleF");
+            checkbox = WriteRuntimeIds ? checkbox.Id("toggle" + index) : checkbox;
+
+            var featureId = "feature" + index;
+            var featureH2 = _html.Tag(Html5Tag.H2).Class("title header");
+            featureH2 = WriteRuntimeIds ? featureH2.Id(featureId) : featureH2;
+
+            var smallLink = WriteRuntimeIds ? GetSmallLink(featureId) : Html.Nothing();
+
+            return _html.Tag(Html5Tag.Article).Class(GetFeatureClasses(feature)).Content(
+                featureH2.Content(
+                    _html.Tag(Html5Tag.Label).Class("controls").Content(
+                        checkbox, 
+                        GetCheckBoxTag()),
+                    _html.Tag(Html5Tag.Span).Class("content").Content(
+                        Html.Text(feature.Info.Name.Format(_stepNameDecorator)),
+                        _html.Tag(Html5Tag.Span).Content(feature.Info.Labels.Select(GetLabel)).SkipEmpty(),
+                        smallLink)),
+                _html.Tag(Html5Tag.Div).Class("description").Content(feature.Info.Description),
+                _html.Tag(Html5Tag.Div).Class("scenarios").Content(
+                    feature.GetScenariosOrderedByName().Select((s, i) => GetScenario(s, index, i))));
         }
 
         protected virtual IHtmlNode GetFilterFreeTextNodes()
@@ -173,15 +205,15 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
                 GetOptionNode(
                     "toggleFeatures",
-                    _html.Checkbox().Checked().SpaceBefore().OnClick("checkAll('toggleF',toggleFeatures.checked)"),
+                    _html.Checkbox().SpaceBefore().OnClick("checkAll('toggleF',toggleFeatures.checked)"),
                     "Features"),
                 GetOptionNode(
                     "toggleScenarios",
-                    _html.Checkbox().Checked().SpaceBefore().OnClick("checkAll('toggleS',toggleScenarios.checked)"),
+                    _html.Checkbox().SpaceBefore().OnClick("checkAll('toggleS',toggleScenarios.checked)"),
                     "Scenarios"),
                 GetOptionNode(
                     "toggleSubSteps",
-                    _html.Checkbox().Checked().SpaceBefore().OnClick("checkAll('toggleSS',toggleSubSteps.checked)"),
+                    _html.Checkbox().SpaceBefore().OnClick("checkAll('toggleSS',toggleSubSteps.checked)"),
                     "Sub Steps"),
                 GetOptionNode(
                     "toggleExampleDiagrams",
@@ -207,36 +239,42 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
             if (hide)
                 optionClasses += " hide";
 
-            return _html.Tag(Html5Tag.Span).Class(optionClasses).Content(element.Id(elementId),
-                _html.Tag(Html5Tag.Label).Content(GetCheckBoxTag(), Html.Text(labelContent)).For(elementId));
+            return _html.Tag(Html5Tag.Span).Class(optionClasses).Content(
+                _html.Tag(Html5Tag.Label).Content(
+                    element.Id(elementId),
+                    GetCheckBoxTag(), 
+                    Html.Text(labelContent)).For(elementId)
+                );
         }
 
-        protected override IHtmlNode GetStep(IStepResult step)
+        protected virtual IHtmlNode GetStep(IStepResult step, bool treatAsPassed)
         {
-            var toggleId = WriteRuntimeIds ? step.Info.RuntimeId.ToString() : "toggleId" + GetNewToggleId();
             var hasSubSteps = step.GetSubSteps().Any();
 
+            TagBuilder CreateCheckbox() => WriteRuntimeIds ? _html.Checkbox().Id(step.Info.RuntimeId.ToString()) : _html.Checkbox();
+            TagBuilder CreateLabelForCheckbox() => _html.Tag(Html5Tag.Label);
+
             var checkbox = hasSubSteps
-                ? _html.Checkbox().Id(toggleId).Class("toggle toggleSS").Checked()
+                ? CreateCheckbox().Class("toggle toggleSS")
                 : Html.Nothing();
 
             var container = hasSubSteps
-                ? _html.Tag(Html5Tag.Label).For(toggleId)
+                ? CreateLabelForCheckbox()
                 : _html.Tag(Html5Tag.Span);
 
             return _html.Tag(Html5Tag.Div).Class("step").Content(
-                checkbox,
                 _html.Tag(Html5Tag.Div).Class("header").Content(
                     container.Class("controls").Content(
+                        checkbox,
                         GetCheckBoxTag(!hasSubSteps),
-                        GetStatus(step.Status)),
+                        GetStatus(treatAsPassed ? ExecutionStatus.Passed : step.Status)),
                     _html.Tag(Html5Tag.Span).Content(
                         Html.Text($"{WebUtility.HtmlEncode(step.Info.GroupPrefix)}{step.Info.Number}. {step.Info.Name.Format(_stepNameDecorator)}").Trim(),
                         GetDuration(step.ExecutionTime))),
                 _html.Tag(Html5Tag.Div).Class("step-parameters")
                     .Content(step.Parameters.Select(GetStepParameter))
                     .SkipEmpty(),
-                _html.Tag(Html5Tag.Div).Class("sub-steps").Content(step.GetSubSteps().Select(GetStep))
+                _html.Tag(Html5Tag.Div).Class("sub-steps").Content(step.GetSubSteps().Select(x => GetStep(x, treatAsPassed)))
                     .SkipEmpty());
         }
 
@@ -248,7 +286,5 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
                 .SkipEmpty()
                 .SpaceBefore();
         }
-
-        private int GetNewToggleId() => _currentToggleIdNumber++;
     }
 }

@@ -78,15 +78,15 @@ section.features {
         margin-bottom: 0;
     }
 
-.toggleF:not(:checked) ~ .scenarios {
+.header:has(.controls .toggleF:not(:checked)) ~ .scenarios {
     display: none;
 }
 
-.toggleS:not(:checked) ~ .header ~ * {
+.header:has(.controls .toggleS:not(:checked)) ~ * {
     display: none;
 }
 
-.toggleSS:not(:checked) ~ .sub-steps {
+.header:has(.controls .toggleSS:not(:checked)) ~ .sub-steps {
     display: none;
 }
 
@@ -435,43 +435,43 @@ input[type="checkbox"], input[type="radio"] {
     visibility: hidden;
 }
 
-input[type="checkbox"]:not(:checked) + * .chbox:before {
+input[type="checkbox"]:not(:checked) + .chbox:before {
     background-color: #ffeeee;
     content: "\2715";
 }
 
-input[type="checkbox"]:checked + * .chbox:before {
+input[type="checkbox"]:checked + .chbox:before {
     background-color: #eeeeee;
     content: "\2713";
 }
 
-input[type="checkbox"].toggle + * .chbox:before {
+input[type="checkbox"].toggle + .chbox:before {
     border-radius: 20%;
     background-color: #eeeeee;
 }
 
-input[type="checkbox"].toggle:not(:checked) + * .chbox:before {
+input[type="checkbox"].toggle:not(:checked) + .chbox:before {
     content: "+";
 }
 
-input[type="checkbox"].toggle:checked + * .chbox:before {
+input[type="checkbox"].toggle:checked + .chbox:before {
     content: "-";
 }
 
-input:hover + * .chbox:before {
+input:hover + .chbox:before {
     background-color: #ffffaa !important;
 }
 
-input[type="radio"] + * .chbox:before {
+input[type="radio"] + .chbox:before {
     border-radius: 50%;
     background-color: #eeeeee;
 }
 
-input[type="radio"]:not(:checked) + * .chbox:before {
+input[type="radio"]:not(:checked) + .chbox:before {
     content: "\00a0";
 }
 
-input[type="radio"]:checked + * .chbox:before {
+input[type="radio"]:checked + .chbox:before {
     content: "\2713";
 }
 

@@ -148,7 +148,7 @@ function updateOptionsLink() {
             options.push(option + '=1');
     };
 
-    check('toggleFeatures', 'tf');
+    check('toggleFeatures', 'tf', false);
     check('toggleScenarios', 'ts', false);
     check('toggleSubSteps', 'tss', false);
 
@@ -191,7 +191,7 @@ function applyOptionsFromLink() {
         element.click(); //toggle it
     };
 
-    applyToCheckbox('toggleFeatures', 'tf');
+    applyToCheckbox('toggleFeatures', 'tf', false);
     applyToCheckbox('toggleScenarios', 'ts', false);
     applyToCheckbox('toggleSubSteps', 'tss', false);
     applyToCheckbox('showPassed', 'fp');

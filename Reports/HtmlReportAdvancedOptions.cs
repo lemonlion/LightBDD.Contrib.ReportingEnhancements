@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using LightBDD.Core.Results;
+using System.Reflection;
 
 namespace LightBDD.Contrib.ReportingEnhancements.Reports;
 
@@ -20,6 +21,7 @@ public class HtmlReportAdvancedOptions
     public bool IncludeIgnoredTests { get; set; } = true;
     public bool StepsHiddenInitially { get; set; } = true;
     public bool FormatResult { get; set; }
+    public Func<IScenarioResult, bool>? TreatScenariosAsPassed { get; set; }
 
     public HtmlReportAdvancedOptions SetOnlyCreateReportOnFullTestRun(Assembly testAssembly)
     {

@@ -54,8 +54,9 @@ public class CustomisableHtmlReportFormatter : IReportFormatter
             ShowStatusFilterToggles = Options.ShowStatusFilterToggles,
             WriteRuntimeIds = Options.WriteRuntimeIds,
             StepsHiddenInitially = Options.StepsHiddenInitially,
-            FormatResult = Options.FormatResult
-        };
+            FormatResult = Options.FormatResult,
+            TreatScenariosAsPassed = Options.TreatScenariosAsPassed
+};
         writer.Write(_options);
     }
 
