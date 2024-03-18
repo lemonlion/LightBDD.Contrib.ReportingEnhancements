@@ -242,8 +242,31 @@ function toggleDiagrams(showDiagrams) {
     Array.from(document.querySelectorAll('details.example-diagrams')).forEach((element) => element.toggleAttribute('open', showDiagrams));
 }
 
+var feature;
+var scenario;
+var searchTimeoutId;
+document.addEventListener("DOMContentLoaded", function (event) {
+    feature = document.getElementsByClassName('feature');
+    scenario = document.getElementsByClassName('scenario');
+});
+
 function search_scenarios() {
     console.log("called search_scenarios");
+    if (!feature) feature = document.getElementsByClassName('feature');
+    if (!scenario) scenario = document.getElementsByClassName('scenario');
+    for (i = 0; i < feature.length; i++) { feature[i].style.opacity = '0.5'; }
+
+    if (searchTimeoutId)
+        clearTimeout(searchTimeoutId);
+
+    searchTimeoutId = setTimeout(function () {
+        run_search_scenarios();
+    }, 1000);
+}
+
+function run_search_scenarios() {
+    console.log("called run_search_scenarios");
+
     let input = document.getElementById('searchbar').value;
     input = input.toLowerCase().trim();
     console.log("input: " + input);
@@ -284,6 +307,8 @@ function search_scenarios() {
 
         scenario[i].style.display = tokenMiss ? "none" : "";
     }
+
+    for (i = 0; i < feature.length; i++) { feature[i].style.opacity = ''; }
 }
 
 function parseSearchTokensIncludingQuotes(str) {
