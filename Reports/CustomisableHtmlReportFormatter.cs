@@ -25,12 +25,12 @@ public class CustomisableHtmlReportFormatter : IReportFormatter
         if (Options.OnlyCreateReportOnFullySuccessfulTestRun)
         {
             if (scenariosRun.Any(x => x.Status == ExecutionStatus.Failed))
-                return; 
+                return;
         }
 
         if (Options.OnlyCreateReportOnFullTestRun)
         {
-            var numberOfTestsInRun = scenariosRun.Count;
+            var numberOfTestsInRun = scenariosRun.Count + IgnoredScenarios.Count;
             var totalNumberOfTests = Options.TestAssembly.CountNumberOfTestsInAssembly();
             if (numberOfTestsInRun != totalNumberOfTests)
                 return;
@@ -39,7 +39,7 @@ public class CustomisableHtmlReportFormatter : IReportFormatter
         WithCustomCss(Stylesheets.GetHideStyleSheet());
         WithCustomCss(Stylesheets.GetPlantUmlStyleSheet());
         WithCustomCss(Stylesheets.GetFilterFreeTextStyleSheet());
-        
+
         using var writer = new CustomisableHtmlResultTextWriter(stream, features)
         {
             Title = Options.Title,

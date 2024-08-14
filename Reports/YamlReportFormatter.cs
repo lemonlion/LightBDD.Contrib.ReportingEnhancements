@@ -31,7 +31,7 @@ public class YamlReportFormatter : IReportFormatter
 
         if (Options.OnlyCreateReportOnFullTestRun)
         {
-            var numberOfTestsInRun = scenariosRun.Count;
+            var numberOfTestsInRun = scenariosRun.Count + IgnoredScenarios.Count;
             var totalNumberOfTests = Options.TestAssembly.CountNumberOfTestsInAssembly();
             if (numberOfTestsInRun != totalNumberOfTests)
                 return;
@@ -55,9 +55,12 @@ public class YamlReportFormatter : IReportFormatter
 
         foreach (var feature in features)
         {
+            var scenarios = feature.GetScenarios().OrderBy(x => x.Info.Labels.Contains(HappyPathLabel)).ThenBy(x => x.Info.Name.ToString()).ToArray();
+            if (scenarios.Length == 0)
+                continue;
+
             yml.Append("  - Feature: " + feature.Info.Name.ToString().SanitiseForYml() + "\n");
             yml.Append("  - Scenarios:\n");
-            var scenarios = feature.GetScenarios().OrderBy(x => x.Info.Labels.Contains(HappyPathLabel)).ThenBy(x => x.Info.Name.ToString()).ToArray();
             foreach (var scenario in scenarios)
             {
                 yml.Append("    - Scenario: " + scenario.Info.Name.ToString().SanitiseForYml() + "\n");
