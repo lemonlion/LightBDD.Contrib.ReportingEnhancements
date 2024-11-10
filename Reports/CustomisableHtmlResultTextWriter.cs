@@ -78,15 +78,13 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
             if (IncludeDiagramsAsCode)
             {
-                var diagram = DiagramAsCode.SingleOrDefault(x => x.TestRuntimeId == scenario.Info.RuntimeId);
+                var diagrams = DiagramAsCode.Where(x => x.TestRuntimeId == scenario.Info.RuntimeId).ToArray();
 
-                if (diagram is not null)
+                if (diagrams.Length != 0)
                 {
-                    scenarioContent.Add(_html.Tag(Html5Tag.Details).Class("example-diagrams").Attribute("open", "").Content
-                    (
-                        _html.Tag(Html5Tag.Summary).Content("Example Diagram").Class("h4"),
-                        _html.Tag(Html5Tag.Details).Class("example").Content
-                        (
+                    var diagramNodes = new List<TagBuilder> { _html.Tag(Html5Tag.Summary).Content("Example Diagram").Class("h4") };
+                    diagramNodes.AddRange(diagrams.Select(diagram => 
+                        _html.Tag(Html5Tag.Details).Class("example").Content(
                             _html.Tag(Html5Tag.Summary).Class("example-image").Content
                             (
                                 _html.Tag(Html5Tag.Img).Attribute(Html5Attribute.Src, diagram.ImgSrc)
@@ -96,8 +94,9 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
                                 _html.Tag(Html5Tag.H4).Content(DiagramsAsCodeCodeBehindTitle),
                                 _html.Tag(Html5Tag.Pre).Content(diagram.CodeBehind)
                             )
-                        )
-                    ));
+                    )));
+
+                    scenarioContent.Add(_html.Tag(Html5Tag.Details).Class("example-diagrams").Attribute("open", "").Content(diagramNodes));
                 }
             }
 
@@ -198,7 +197,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
                     GetOptionNode("showNotRun", GetStatusFilter(ExecutionStatus.NotRun), "Not Run")));
         }
 
-        protected virtual IHtmlNode GetToggleNodes()
+        protected override IHtmlNode GetToggleNodes()
         {
             var toggles = new List<IHtmlNode>
             {
