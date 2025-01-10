@@ -22,6 +22,7 @@ public class HtmlReportAdvancedOptions
     public bool StepsHiddenInitially { get; set; } = true;
     public bool FormatResult { get; set; }
     public Func<IScenarioResult, bool>? TreatScenariosAsPassed { get; set; }
+    public bool LazyLoadDiagramImages { get; set; } = true;
 
     public HtmlReportAdvancedOptions SetOnlyCreateReportOnFullTestRun(Assembly testAssembly)
     {

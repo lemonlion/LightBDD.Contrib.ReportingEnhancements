@@ -55,7 +55,8 @@ public class CustomisableHtmlReportFormatter : IReportFormatter
             WriteRuntimeIds = Options.WriteRuntimeIds,
             StepsHiddenInitially = Options.StepsHiddenInitially,
             FormatResult = Options.FormatResult,
-            TreatScenariosAsPassed = Options.TreatScenariosAsPassed
+            TreatScenariosAsPassed = Options.TreatScenariosAsPassed,
+            LazyLoadDiagramImages = Options.LazyLoadDiagramImages
 };
         writer.Write(_options);
     }
