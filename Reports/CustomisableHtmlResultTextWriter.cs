@@ -23,6 +23,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
         public bool StepsHiddenInitially { get; set; }
         public bool FormatResult { get; set; }
         public Func<IScenarioResult, bool>? TreatScenariosAsPassed { get; set; }
+        public bool LazyLoadDiagramImages { get; set; } = true;
 
         public CustomisableHtmlResultTextWriter(Stream outputStream, IFeatureResult[] features) : base(outputStream, 
             features,
@@ -87,7 +88,9 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
                         _html.Tag(Html5Tag.Details).Class("example").Content(
                             _html.Tag(Html5Tag.Summary).Class("example-image").Content
                             (
-                                _html.Tag(Html5Tag.Img).Attribute(Html5Attribute.Src, diagram.ImgSrc)
+                                LazyLoadDiagramImages
+                                    ? _html.Tag(Html5Tag.Img).Attribute(Html5Attribute.Src, diagram.ImgSrc).Attribute(Html5Attribute.Loading, "lazy")
+                                    : _html.Tag(Html5Tag.Img).Attribute(Html5Attribute.Src, diagram.ImgSrc)
                             ),
                             _html.Tag(Html5Tag.Div).Class("raw-plantuml").Content
                             (

@@ -14,6 +14,7 @@
         Rel,
         Colspan,
         Content,
-        Src
+        Src,
+        Loading
     }
 }

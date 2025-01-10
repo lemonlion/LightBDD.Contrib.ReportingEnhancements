@@ -2,21 +2,14 @@
 
 namespace LightBDD.Contrib.ReportingEnhancements.Reports
 {
-    public class HtmlTextWriter : IDisposable
+    public class HtmlTextWriter(TextWriter writer) : IDisposable
     {
-        private static readonly string[] VoidElements = { "area", "base", "br", "col", "hr", "img", "input", "link", "meta", "param", "command", "keygen", "source", "img" };
-        private static readonly string[] NoClosingSlashVoidElements = { "br", "img" };
-
-        private readonly TextWriter _writer;
-
-        public HtmlTextWriter(TextWriter writer)
-        {
-            _writer = writer;
-        }
+        private static readonly string[] VoidElements = ["area", "base", "br", "col", "hr", "img", "input", "link", "meta", "param", "command", "keygen", "source", "img"];
+        private static readonly string[] NoClosingSlashVoidElements = ["br", "img"];
 
         public void Dispose()
         {
-            _writer.Dispose();
+            writer.Dispose();
         }
 
         public void OpenTag(string tag, IEnumerable<KeyValuePair<string, string>> attributes)
@@ -61,7 +54,7 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
         {
             Write(" ");
             Write(attribute);
-            if (value == null)
+            if (value is null)
                 return;
             Write("=\"");
             WriteEncodedText(value);
@@ -70,12 +63,12 @@ namespace LightBDD.Contrib.ReportingEnhancements.Reports
 
         public void Write(string text)
         {
-            _writer.Write(text);
+            writer.Write(text);
         }
 
         public void WriteEncodedText(string text)
         {
-            _writer.Write(WebUtility.HtmlEncode(text));
+            writer.Write(WebUtility.HtmlEncode(text));
         }
 
         internal HtmlTextWriter WriteTag(IHtmlNode node)
