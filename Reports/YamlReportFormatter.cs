@@ -57,7 +57,7 @@ public class YamlReportFormatter : IReportFormatter
             yml.Append("  - Feature: " + feature.Info.Name.ToString().SanitiseForYml() + "\n");
 
             if (feature.Info.Description is not null)
-                yml.Append("    Description: " + feature.Info.Description + "\n");
+                yml.Append("    Description: \"" + feature.Info.Description + "\"\n");
 
             yml.Append("    Scenarios:\n");
 
@@ -65,20 +65,20 @@ public class YamlReportFormatter : IReportFormatter
             foreach (var scenario in orderedScenarios)
             {
                 yml.Append("      - Scenario: " + scenario.Info.Name.ToString().SanitiseForYml() + "\n");
-                yml.Append("        IsHappyPath: " + scenario.Info.Labels.Any(x => x == happyPathLabel).ToString().ToLower());
+                yml.Append("        IsHappyPath: " + scenario.Info.Labels.Any(x => x == happyPathLabel).ToString().ToLower() + "\n");
                 var steps = scenario.GetSteps();
-                yml.Append("        Definition: " + "\n");
+                yml.Append("        Definition:" + "\n");
                 CreateSteps(steps, yml);
                 yml.Append("\n\n");
             }
         }
 
-        return yml.ToString();
+        return yml.ToString().TrimEnd();
     }
 
-    private static void CreateSteps(IEnumerable<IStepResult> steps, StringBuilder yml, string indent = "    ")
+    private static void CreateSteps(IEnumerable<IStepResult> steps, StringBuilder yml, string indent = "        ")
     {
-        indent += "      ";
+        indent += "  ";
         foreach (var step in steps)
         {
             yml.Append(indent + step.Info.Name.ToString().SanitiseForYml() + $" (STEP {step.Info.GroupPrefix}{step.Info.Number})" + "\n");
