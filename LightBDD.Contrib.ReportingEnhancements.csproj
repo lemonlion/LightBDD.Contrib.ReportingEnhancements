@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Title>LightBDD.Contrib.ReportingEnhancements</Title>
-    <Version>1.4.1</Version>
+    <Version>1.5.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
@@ -24,9 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LightBDD.Core" Version="3.8.0" />
-    <PackageReference Include="LightBDD.Framework" Version="3.8.0" />
-    <PackageReference Include="LightBDD.XUnit2" Version="3.8.0" />
+    <PackageReference Include="LightBDD.Core" Version="3.10.0" />
+    <PackageReference Include="LightBDD.Framework" Version="3.10.0" />
+    <PackageReference Include="LightBDD.XUnit2" Version="3.10.0" />
   </ItemGroup>
 
 </Project>

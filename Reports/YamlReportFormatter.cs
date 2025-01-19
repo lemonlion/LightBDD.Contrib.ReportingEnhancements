@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using LightBDD.Core.Execution;
 using LightBDD.Core.Results;
 using LightBDD.Framework.Reporting.Formatters;
 
@@ -43,27 +44,30 @@ public class YamlReportFormatter : IReportFormatter
 
     #endregion
 
-    private static string ToYamlDocument(IFeatureResult[] features, YamlReportOptions? options)
+    public static string ToYamlDocument(IFeatureResult[] features, YamlReportOptions? options)
     {
-        features = features.OrderBy(x => x.Info.Name.ToString()).ToArray();
-
         var yml = new StringBuilder();
         yml.Append("Title: " + options.Title + "\n");
         yml.Append("Features:\n");
 
-        const string HappyPathLabel = "Happy Path";
+        const string happyPathLabel = "Happy Path";
 
         foreach (var feature in features)
         {
             yml.Append("  - Feature: " + feature.Info.Name.ToString().SanitiseForYml() + "\n");
-            yml.Append("  - Scenarios:\n");
-            var scenarios = feature.GetScenarios().OrderBy(x => x.Info.Labels.Contains(HappyPathLabel)).ThenBy(x => x.Info.Name.ToString()).ToArray();
-            foreach (var scenario in scenarios)
+
+            if (feature.Info.Description is not null)
+                yml.Append("    Description: " + feature.Info.Description + "\n");
+
+            yml.Append("    Scenarios:\n");
+
+            var orderedScenarios = feature.GetScenarios().OrderBy(x => x.Info.Labels.Contains(happyPathLabel)).ThenBy(x => x.Info.Name.ToString());
+            foreach (var scenario in orderedScenarios)
             {
-                yml.Append("    - Scenario: " + scenario.Info.Name.ToString().SanitiseForYml() + "\n");
-                yml.Append("      IsHappyPath: " + scenario.Info.Labels.Any(x => x == HappyPathLabel).ToString().ToLower() + "\n");
+                yml.Append("      - Scenario: " + scenario.Info.Name.ToString().SanitiseForYml() + "\n");
+                yml.Append("        IsHappyPath: " + scenario.Info.Labels.Any(x => x == happyPathLabel).ToString().ToLower());
                 var steps = scenario.GetSteps();
-                yml.Append("      Definition: " + "\n");
+                yml.Append("        Definition: " + "\n");
                 CreateSteps(steps, yml);
                 yml.Append("\n\n");
             }
@@ -74,7 +78,7 @@ public class YamlReportFormatter : IReportFormatter
 
     private static void CreateSteps(IEnumerable<IStepResult> steps, StringBuilder yml, string indent = "    ")
     {
-        indent += "    ";
+        indent += "      ";
         foreach (var step in steps)
         {
             yml.Append(indent + step.Info.Name.ToString().SanitiseForYml() + $" (STEP {step.Info.GroupPrefix}{step.Info.Number})" + "\n");
